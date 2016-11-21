@@ -7,6 +7,7 @@ import sqlite3
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
 from flask_script import Shell
+import hashlib
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
@@ -27,6 +28,15 @@ def make_shell_context():
     return dict(app=app, db=db, Post=Post)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 
+#404和500界面
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('error.html'), 500
+
+#主页
 @app.route('/')
 def index():
     tem = Post.query.all()  
@@ -37,6 +47,24 @@ def index():
     else:
         return render_template('index.html',tem=tem,pmax=pmax,pg=1)
 
+#管理员登陆
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        pass_word = request.form['passwd']
+        m = hashlib.md5()
+        if not pass_word:
+            pass_word = ''
+        else:
+            pass_word += '1396'
+        m.update(pass_word)
+        if m.hexdigest()=='01bf2bf3375b3fbaf8d2dac6dad08c84':
+            session['log'] = True
+            return redirect(url_for('admin'))
+    return render_template('login.html')
+
+
+#数据库模型
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)

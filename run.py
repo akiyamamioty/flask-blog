@@ -36,7 +36,7 @@ def page_not_found(e):
 def internal_server_error(e):
     return render_template('error.html'), 500
 
-#主页
+#主页 todo
 @app.route('/')
 def index():
     tem = Post.query.all()  
@@ -47,7 +47,7 @@ def index():
     else:
         return render_template('index.html',tem=tem,pmax=pmax,pg=1)
 
-#管理员登陆
+#管理员登陆 finish password = 000000
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

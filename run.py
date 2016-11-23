@@ -47,6 +47,7 @@ def index():
     print type(tem)
     print tem[0].title
     print tem[4].file_img
+    print tem[4].tags
     pmax = 9
     if False:
         session['new']=True

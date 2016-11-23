@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import os 
+import datetime
 from flask import Flask, render_template, session, redirect, url_for, request, g, flash, send_from_directory
 from flask_script import Manager
 import sqlite3
@@ -45,6 +46,7 @@ def index():
     tem = Post.query.all()  
     print type(tem)
     print tem[0].title
+    print tem[4].file_img
     pmax = 9
     if False:
         session['new']=True
@@ -78,7 +80,7 @@ def new():
                 abstract = abstr(request.form['editor'],request.form['img'])
                 tags = (request.form['tags'] or '').replace('，',',')
                 post = Post(title=request.form['title'], content=request.form['editor'], \
-                    abstract=abstract, tags=tags,)
+                    abstract=abstract, tags=tags,file_img = request.form['file'])
                 db.session.add(post)
                 try:
                     db.session.commit()
@@ -108,7 +110,9 @@ class Post(db.Model):
     content = db.Column(db.Text)
     abstract = db.Column(db.Text)
     tags = db.Column(db.String)
-    #timestamp = db.Column(db.DateTime, index=True)
+    file_img = db.Column(db.SmallInteger)
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
+
 
 
 

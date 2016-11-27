@@ -89,16 +89,7 @@ def new():
                     db.session.commit()
                 except:
                     db.session.rollback()
-                '''
-                cur.execute('select id from blog order by id desc limit 1')
-                blog=cur.fetchall()
-                blog=blog[0][0]
-                tags=tags.split(',')
-                for tag in tags:
-                    cur.execute('insert into tag (tag, blog) values (?, ?)', (tag, blog))
-                get_db().commit()
-                '''
-                return redirect(url_for('index',pg=1))
+                return redirect(url_for('page',pg=1))
             elif request.form['editor']:
                 return render_template('edit.html',content=request.form['editor'],img=request.form['img'])
         return render_template('edit.html')
@@ -137,7 +128,52 @@ class Post(db.Model):
     file_img = db.Column(db.SmallInteger)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
 
-
+#博客详情页
+@app.route('/article/<int:bg_id>', methods=['GET', 'POST'])
+def article(bg_id):
+    #todo 博客回复以及回复的回复的存入
+    if request.method == 'POST':
+        if request.form['comment']:
+                author = request.form['author'] or u'访客'
+                cur=get_db().cursor()
+                cur.execute('insert into comm (content, author, blog, reply) values (?, ?, ?, ?)', (request.form['comment'], author, bg_id, request.form['reply'] or None))
+                get_db().commit()
+                return redirect(url_for('article',bg_id=bg_id))
+    #cont=cont 暂时取消评论 
+    try:
+        print 1
+        cont = Post.query.filter_by(id = bg_id).first()
+        '''
+        cur=get_db().cursor()
+        cur.execute('SELECT title, date, content, tag, abstract from blog where id=?',(bg_id,))
+        cont=cur.fetchall()[0]'''
+    except:
+        return render_template('error.html'), 404
+    todo 博客回复以及回复的回复的读取
+    else:
+        
+        '''
+        cur.execute(' SELECT content, date, author,id,reply FROM comm WHERE blog=? ORDER BY id DESC',(bg_id,))
+        tem=cur.fetchall() or []
+        tem=list(tem)
+        tem=map(lambda x:list(x),tem)
+        idli=map(lambda x:x[3],tem)
+        t=0
+        while t < len(tem):
+            if type(tem[t][4]) == int:
+                try:
+                    reid = idli.index(tem[t][4])
+                    tem[reid][4]=tem[reid][4] or []
+                    tem[reid][4].insert(0,tem[t])
+                    tem.pop(t)
+                    idli.pop(t)
+                    t -= 1
+                finally:
+                    pass
+            t += 1
+        '''
+        print cont.title
+        return render_template('article.html',id=bg_id,cont=cont) #tem=tem暂时取消评论 
 
 
 def abstr(text,img=""):

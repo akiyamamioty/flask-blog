@@ -43,12 +43,13 @@ def internal_server_error(e):
 #主页 todo
 @app.route('/')
 def index():
-    tem = Post.query.all()  
+    tem = Post.query.order_by(Post.id.desc()).all()
     print type(tem)
     print tem[0].title
     print tem[4].file_img
     print tem[4].tags
-    pmax = 9
+    blog_count = len(Post.query.all())
+    pmax=((blog_count+7)/8 or 1)
     if False:
         session['new']=True
         return render_template('index.html',tem=tem,pmax=pmax,pg=1)
@@ -75,6 +76,7 @@ def login():
 #创建新博文 todo
 @app.route('/new', methods=['GET', 'POST'])
 def new():
+    print session.get('log')
     if session.get('log'):
         if request.method == 'POST':
             if request.form['editor'] and request.form['title']:
@@ -102,6 +104,27 @@ def new():
         return render_template('edit.html')
     return redirect(url_for('page',pg=1))
 
+#删除文章
+@app.route('/dele/<int:bg_id>')
+def dele(bg_id):
+    if session.get('log'):
+        try:
+            article = Post.query.filter_by(id=bg_id).first()
+            db.session.delete(article)
+        except:
+            return redirect(url_for('page',pg=1))
+    return redirect(url_for('page',pg=1))
+
+#页数 每页显示8篇文章
+@app.route('/page/<int:pg>')
+def page(pg):
+    tem = Post.query.order_by(Post.id.desc()).limit(8).offset(pg*8-8)
+    blog_count = len(Post.query.all())
+    pmax=((blog_count+7)/8 or 1)
+    if pg > pmax or pg < 1:
+        return render_template('error.html'), 404
+    else:
+        return render_template('page.html',tem=tem,pmax=pmax,pg=pg)
 
 #数据库模型
 class Post(db.Model):

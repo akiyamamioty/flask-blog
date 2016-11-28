@@ -107,6 +107,7 @@ def dele(bg_id):
 @app.route('/page/<int:pg>')
 def page(pg):
     tem = Post.query.order_by(Post.id.desc()).limit(8).offset(pg*8-8)
+    print tem[0].file_img
     blog_count = len(Post.query.all())
     pmax=((blog_count+7)/8 or 1)
     if pg > pmax or pg < 1:
@@ -133,6 +134,7 @@ class Comment(db.Model):
     author = db.Column(db.String)
     blog_comment = db.Column(db.Text)
     blog_id = db.Column(db.Integer) #db.ForeignKey('posts.id')
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
 
 
 
@@ -143,16 +145,17 @@ def article(bg_id):
     if request.method == 'POST':
         if request.form['comment']:
             author = request.form['author'] or u'访客'
-            com = Post.query.filter_by(id=bg_id).first()
-            print com
+            com = Comment()
             com.blog_comment = request.form['comment']
             com.author = author
             com.blog_id = bg_id
+            print com.blog_comment
+            print com.author
+            print com.blog_id
             db.session.add(com)
             return redirect(url_for('article',bg_id=bg_id))
     #cont=cont 暂时取消评论 
     try:
-        print 1
         cont = Post.query.filter_by(id = bg_id).first()
         '''
         cur=get_db().cursor()
@@ -162,11 +165,7 @@ def article(bg_id):
         return render_template('error.html'), 404
     #todo 博客回复以及回复的回复的读取
     else:
-        if Comment.query.filter_by(blog_id=bg_id).all():
-            tem = Comment.query.filter(blog_id=bg_id).all()
-        else:
-            tem = []
-
+        tem = Comment.query.filter_by(blog_id=bg_id).order_by(Comment.id.desc()).all()
         '''
         cur.execute(' SELECT content, date, author,id,reply FROM comm WHERE blog=? ORDER BY id DESC',(bg_id,))
         tem=cur.fetchall() or []
@@ -187,7 +186,6 @@ def article(bg_id):
                     pass
             t += 1
         '''
-        print cont.title
         return render_template('article.html',id=bg_id,cont=cont,tem=tem) #tem=tem暂时取消评论 
 
 

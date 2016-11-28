@@ -51,17 +51,17 @@
 {%- for ct in tem %}
 <div class="comm">
 <HR color=#ddd SIZE=1>
-<span>{{ ct[2] }}</span>
-<a href="#-1"><rep id="{{ ct[3] }}">&#61714;&nbsp;回复</rep></a>
-<pre>{{ ct[0] }}</pre>
-<p>{{ ct[1] }}</p>
+<span>{{ ct.author }}</span>
+<!-- <a href="#-1"><rep id="{{ ct[3] }}">&#61714;&nbsp;回复</rep></a> -->
+<pre>{{ ct.blog_comment }}</pre>
+<p>{{ ct.timestamp }}</p>
 {% if session.get('log') and ct[1] != "" %}
 <a href="/del/{{ id }}/{{ ct[3] }}"><button class="sm">删除</button></a>
 {% endif %}
 
 
 
-{% if ct[4] %}
+{% if 1==2 %}
 {%- for ctt in ct[4] %}
 
 

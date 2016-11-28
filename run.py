@@ -45,9 +45,6 @@ def internal_server_error(e):
 def index():
     tem = Post.query.order_by(Post.id.desc()).all()
     print type(tem)
-    print tem[0].title
-    print tem[4].file_img
-    print tem[4].tags
     blog_count = len(Post.query.all())
     pmax=((blog_count+7)/8 or 1)
     if False:
@@ -127,6 +124,17 @@ class Post(db.Model):
     tags = db.Column(db.String)
     file_img = db.Column(db.SmallInteger)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
+    #comment = db.relationship('Comment', backref='blog_id1')
+    
+
+class Comment(db.Model):
+    __tablename__ = 'comment'
+    id = db.Column(db.Integer, primary_key=True)
+    author = db.Column(db.String)
+    blog_comment = db.Column(db.Text)
+    blog_id = db.Column(db.Integer) #db.ForeignKey('posts.id')
+
+
 
 #博客详情页
 @app.route('/article/<int:bg_id>', methods=['GET', 'POST'])
@@ -134,11 +142,14 @@ def article(bg_id):
     #todo 博客回复以及回复的回复的存入
     if request.method == 'POST':
         if request.form['comment']:
-                author = request.form['author'] or u'访客'
-                cur=get_db().cursor()
-                cur.execute('insert into comm (content, author, blog, reply) values (?, ?, ?, ?)', (request.form['comment'], author, bg_id, request.form['reply'] or None))
-                get_db().commit()
-                return redirect(url_for('article',bg_id=bg_id))
+            author = request.form['author'] or u'访客'
+            com = Post.query.filter_by(id=bg_id).first()
+            print com
+            com.blog_comment = request.form['comment']
+            com.author = author
+            com.blog_id = bg_id
+            db.session.add(com)
+            return redirect(url_for('article',bg_id=bg_id))
     #cont=cont 暂时取消评论 
     try:
         print 1
@@ -149,9 +160,13 @@ def article(bg_id):
         cont=cur.fetchall()[0]'''
     except:
         return render_template('error.html'), 404
-    todo 博客回复以及回复的回复的读取
+    #todo 博客回复以及回复的回复的读取
     else:
-        
+        if Comment.query.filter_by(blog_id=bg_id).all():
+            tem = Comment.query.filter(blog_id=bg_id).all()
+        else:
+            tem = []
+
         '''
         cur.execute(' SELECT content, date, author,id,reply FROM comm WHERE blog=? ORDER BY id DESC',(bg_id,))
         tem=cur.fetchall() or []
@@ -173,7 +188,7 @@ def article(bg_id):
             t += 1
         '''
         print cont.title
-        return render_template('article.html',id=bg_id,cont=cont) #tem=tem暂时取消评论 
+        return render_template('article.html',id=bg_id,cont=cont,tem=tem) #tem=tem暂时取消评论 
 
 
 def abstr(text,img=""):

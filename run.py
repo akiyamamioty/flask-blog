@@ -70,6 +70,20 @@ def login():
             return redirect(url_for('admin'))
     return render_template('login.html')
 
+#分类博客
+@app.route('/arch<int:arc>/<int:pg>')
+def arch(arc,pg):
+    tem = Post.query.filter_by(file_img=arc).order_by(Post.id.desc()).limit(8).offset(pg*8-8)
+    try:
+        blog_count = len(Post.query.filter_by(file_img=arc).all())
+        pmax=((blog_count+7)/8 or 1)
+    finally:
+        pmax=pmax or 1
+    if pg > pmax or pg < 1:
+        return render_template('error.html'), 404
+    else:
+        return render_template('page.html',tem=tem,pmax=pmax,pg=pg)
+
 #创建新博文 todo
 @app.route('/new', methods=['GET', 'POST'])
 def new():

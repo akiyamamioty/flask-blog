@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import os 
+import thread
 import datetime
 from flask import Flask, render_template, session, redirect, url_for, request, g, flash, send_from_directory
 from flask_script import Manager
@@ -220,7 +221,7 @@ def abstr(text,img=""):
     text=text.replace(u'\n\n\n',u'\n')
     text=text.replace(u'\n\n',u'\n')
     print text
-    text=text[:120]+'...'+'<center>'+img+'</center>'
+    text=text[:120]+'...'+'<center><img src='+img+'>+</center>'
     return text
 
 

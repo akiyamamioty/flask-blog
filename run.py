@@ -130,6 +130,10 @@ def page(pg):
     else:
         return render_template('page.html',tem=tem,pmax=pmax,pg=pg)
 
+@app.route('/lovetc')
+def love():
+    return render_template('fortc.html')
+
 #数据库模型
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -223,6 +227,7 @@ def abstr(text,img=""):
     print text
     text=text[:120]+'...'+'<center><img src='+img+'>+</center>'
     return text
+
 
 
 if __name__ == '__main__':

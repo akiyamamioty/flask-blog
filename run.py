@@ -8,7 +8,7 @@ from flask_script import Manager
 import sqlite3
 from flask import g
 from flask_sqlalchemy import SQLAlchemy
-from flask_script import Shell
+from flask_script import Shell, Server
 import hashlib
 from flask_migrate import Migrate, MigrateCommand
 import sys
@@ -32,6 +32,7 @@ def make_shell_context():
     return dict(app=app, db=db, Post=Post)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
+manager.add_command("runserver",Server(host='0.0.0.0',port=8080))
 
 #404和500界面
 @app.errorhandler(404)
@@ -207,7 +208,7 @@ def article(bg_id):
         '''
         return render_template('article.html',id=bg_id,cont=cont,tem=tem) #tem=tem暂时取消评论 
 
-
+#简介+缩略图
 def abstr(text,img=""):
     text=text[:1200]
     text=text.replace(u'&nbsp;',u' ')
@@ -228,7 +229,7 @@ def abstr(text,img=""):
     text=text[:120]+'...'+'<center><img src='+img+'>+</center>'
     return text
 
-
+#question:部署后session貌似没办法在各个页面之间传递，数据库迁移问题
 
 if __name__ == '__main__':
     manager.run()

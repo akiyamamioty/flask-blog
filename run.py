@@ -32,7 +32,6 @@ def make_shell_context():
     return dict(app=app, db=db, Post=Post)
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command("db", MigrateCommand)
-manager.add_command("runserver",Server(host='0.0.0.0',port=8080))
 
 #404和500界面
 @app.errorhandler(404)
@@ -115,6 +114,7 @@ def dele(bg_id):
         try:
             article = Post.query.filter_by(id=bg_id).first()
             db.session.delete(article)
+            db.session.commit()
         except:
             return redirect(url_for('page',pg=1))
     return redirect(url_for('page',pg=1))
@@ -169,10 +169,8 @@ def article(bg_id):
             com.blog_comment = request.form['comment']
             com.author = author
             com.blog_id = bg_id
-            print com.blog_comment
-            print com.author
-            print com.blog_id
             db.session.add(com)
+            db.session.commit()
             return redirect(url_for('article',bg_id=bg_id))
     #cont=cont 暂时取消评论 
     try:
@@ -185,7 +183,9 @@ def article(bg_id):
         return render_template('error.html'), 404
     #todo 博客回复以及回复的回复的读取
     else:
+        print 1
         tem = Comment.query.filter_by(blog_id=bg_id).order_by(Comment.id.desc()).all()
+        print 2
         '''
         cur.execute(' SELECT content, date, author,id,reply FROM comm WHERE blog=? ORDER BY id DESC',(bg_id,))
         tem=cur.fetchall() or []

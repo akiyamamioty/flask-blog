@@ -22,11 +22,11 @@
     {% endif %}
     <p class="xs" style="float:right">{{ cont.timestamp }}</p>
     <br><br>
-    <arti>{{ cont.content|safe|markdown}}</arti>
-    {% filter markdown %}
+    <arti>{{ cont.content|safe}}</arti>
+<!--     {% filter markdown %}
     I'm writing my templates in *Markdown!*
         ##1
-    {% endfilter %}
+    {% endfilter %} -->
     <br>
     <div class="ltag">
     <span>&#61484;</span>

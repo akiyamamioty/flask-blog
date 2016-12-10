@@ -182,10 +182,6 @@ def article(bg_id):
     #cont=cont 暂时取消评论 
     try:
         cont = Post.query.filter_by(id = bg_id).first()
-        print type(cont.content)
-        print cont.content
-        cont.content = markdown(cont.content)
-        print cont.content
         '''
         cur=get_db().cursor()
         cur.execute('SELECT title, date, content, tag, abstract from blog where id=?',(bg_id,))

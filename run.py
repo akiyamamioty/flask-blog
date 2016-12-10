@@ -3,7 +3,7 @@
 import os 
 import thread
 import datetime
-from flask import Flask, render_template, session, redirect, url_for, request, g, flash, send_from_directory
+from flask import Flask, render_template, session, redirect, url_for, request, g, flash, send_from_directory, Markup
 from flask_script import Manager
 import sqlite3
 from flask import g
@@ -12,15 +12,22 @@ from flask_script import Shell, Server
 import hashlib
 from flask_migrate import Migrate, MigrateCommand
 import sys
+# import markdown
+# from flaskext.markdown import Markdown
+from flask.ext.misaka import markdown
+from flask.ext.misaka import Misaka
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
-
+# from flask.ext.misaka import Misaka
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
+
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
+# Markdown(app)
+Misaka(app)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -68,7 +75,7 @@ def login():
         if m.hexdigest()=='01bf2bf3375b3fbaf8d2dac6dad08c84':
             session['log'] = True
             print session['log']
-            return redirect(url_for('admin'))
+            return redirect(url_for('new'))
     return render_template('login.html')
 
 #分类博客
@@ -175,6 +182,10 @@ def article(bg_id):
     #cont=cont 暂时取消评论 
     try:
         cont = Post.query.filter_by(id = bg_id).first()
+        print type(cont.content)
+        print cont.content
+        cont.content = markdown(cont.content)
+        print cont.content
         '''
         cur=get_db().cursor()
         cur.execute('SELECT title, date, content, tag, abstract from blog where id=?',(bg_id,))

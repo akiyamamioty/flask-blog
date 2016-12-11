@@ -14,8 +14,8 @@ from flask_migrate import Migrate, MigrateCommand
 import sys
 # import markdown
 # from flaskext.markdown import Markdown
-from flask.ext.misaka import markdown
-from flask.ext.misaka import Misaka
+#from flask.ext.misaka import markdown
+#from flask.ext.misaka import Misaka
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
 # from flask.ext.misaka import Misaka
@@ -27,7 +27,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
 # Markdown(app)
-Misaka(app)
+#Misaka(app)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
@@ -124,7 +124,6 @@ def dele(bg_id):
             db.session.commit()
         except:
             return redirect(url_for('page',pg=1))
-    return redirect(url_for('page',pg=1))
 
 #页数 每页显示8篇文章
 @app.route('/page/<int:pg>')
@@ -141,6 +140,30 @@ def page(pg):
 @app.route('/lovetc')
 def love():
     return render_template('fortc.html')
+
+@app.route('/edit/<int:bg_id>', methods=['GET', 'POST'])
+def edit(bg_id):
+    if session.get('log'):
+        try:
+            cont = Post.query.filter_by(id = bg_id).first()
+        except:
+            return redirect(url_for('page',pg=1))
+        if request.method == 'POST':
+            if request.form['editor'] and request.form['title']:
+                abstract = abstr(request.form['editor'],request.form['img'])
+                tags = (request.form['tags'] or '').replace('，',',')
+                post = Post(title=request.form['title'], content=request.form['editor'], \
+                    abstract=abstract, tags=tags,file_img = request.form['file'])
+                db.session.add(post)
+                try:
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+                return redirect(url_for('page',pg=1))
+            elif request.form['editor']:
+                return render_template('edit.html',content=request.form['editor'],img=request.form['img'])
+        return render_template('edit.html',content=cont.content,title=cont.title,tags=cont.tags)
+    return redirect(url_for('page',pg=1))
 
 #数据库模型
 class Post(db.Model):
@@ -213,8 +236,7 @@ def article(bg_id):
                     pass
             t += 1
         '''
-        return render_template('article.html',id=bg_id,cont=cont,tem=tem) #tem=tem暂时取消评论 
-
+        return render_template('article.html',id=bg_id,cont=cont,tem=tem) 
 #简介+缩略图
 def abstr(text,img=""):
     text=text[:1200]

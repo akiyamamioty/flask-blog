@@ -12,22 +12,16 @@ from flask_script import Shell, Server
 import hashlib
 from flask_migrate import Migrate, MigrateCommand
 import sys
-# import markdown
-# from flaskext.markdown import Markdown
-#from flask.ext.misaka import markdown
-#from flask.ext.misaka import Misaka
+
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
-# from flask.ext.misaka import Misaka
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager = Manager(app)
-# Markdown(app)
-#Misaka(app)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True

@@ -169,7 +169,6 @@ class Post(db.Model):
     tags = db.Column(db.String)
     file_img = db.Column(db.SmallInteger)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
-    #comment = db.relationship('Comment', backref='blog_id1')
     
 
 class Comment(db.Model):
@@ -177,7 +176,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String)
     blog_comment = db.Column(db.Text)
-    blog_id = db.Column(db.Integer) #db.ForeignKey('posts.id')
+    blog_id = db.Column(db.Integer)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.datetime.now())
 
 
@@ -199,10 +198,6 @@ def article(bg_id):
     #cont=cont 暂时取消评论 
     try:
         cont = Post.query.filter_by(id = bg_id).first()
-        '''
-        cur=get_db().cursor()
-        cur.execute('SELECT title, date, content, tag, abstract from blog where id=?',(bg_id,))
-        cont=cur.fetchall()[0]'''
     except:
         return render_template('error.html'), 404
     #todo 博客回复以及回复的回复的读取
@@ -253,6 +248,6 @@ def abstr(text,img=""):
     return text
 
 #question:部署后session貌似没办法在各个页面之间传递，数据库迁移问题
-
+#session有效传递，只是部署后一定要自己commit？？
 if __name__ == '__main__':
     manager.run()

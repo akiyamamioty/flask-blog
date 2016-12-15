@@ -144,11 +144,15 @@ def edit(bg_id):
             return redirect(url_for('page',pg=1))
         if request.method == 'POST':
             if request.form['editor'] and request.form['title']:
+                cont = Post.query.filter_by(id = bg_id).first()
                 abstract = abstr(request.form['editor'],request.form['img'])
                 tags = (request.form['tags'] or '').replace('，',',')
-                post = Post(title=request.form['title'], content=request.form['editor'], \
-                    abstract=abstract, tags=tags,file_img = request.form['file'])
-                db.session.add(post)
+                cont.title=request.form['title']
+                cont.content=request.form['editor']
+                cont.abstract=abstract
+                cont.tags=tags
+                cont.file_img = request.form['file']
+                db.session.add(cont)
                 try:
                     db.session.commit()
                 except:

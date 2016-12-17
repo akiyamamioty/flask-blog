@@ -134,7 +134,7 @@ def page(pg):
 @app.route('/lovetc')
 def love():
     return render_template('fortc.html')
-
+#时间搞事情 todo
 @app.route('/edit/<int:bg_id>', methods=['GET', 'POST'])
 def edit(bg_id):
     if session.get('log'):

@@ -96,7 +96,7 @@ def new():
                 abstract = abstr(request.form['editor'],request.form['img'])
                 tags = (request.form['tags'] or '').replace('，',',')
                 post = Post(title=request.form['title'], content=request.form['editor'], \
-                    abstract=abstract, tags=tags,file_img = request.form['file'])
+                    abstract=abstract, tags=tags,file_img = request.form['file'],timestamp = datetime.datetime.now())
                 db.session.add(post)
                 try:
                     db.session.commit()
@@ -152,6 +152,7 @@ def edit(bg_id):
                 cont.content=request.form['editor']
                 cont.abstract=abstract
                 cont.tags=tags
+                cont.timestamp = datetime.datetime.now()
                 cont.file_img = request.form['file']
                 db.session.add(cont)
                 try:
@@ -196,6 +197,7 @@ def article(bg_id):
             com = Comment()
             com.blog_comment = request.form['comment']
             com.author = author
+            com.timestamp = datetime.datetime.now()
             com.blog_id = bg_id
             db.session.add(com)
             db.session.commit()
